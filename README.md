@@ -20,7 +20,7 @@ npm install
 
 Clone the repository:
 ```
-git clone https://github.com/SCM-MM/mtm-forum.git
+git clone [https://github.com/SCM-MM/mtm-forum.git](https://github.com/pyaephyothet/to-do-vue-tailwind.git)
 ```
 
 Change into the project directory:
