@@ -28,10 +28,6 @@ Change into the project directory:
 cd todo
 ```
 
-```
-composer install
-```
-
 ## Server Run
 
 Run the dev server:
