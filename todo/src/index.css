@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .all {
+  }
+
+  .filter_btn {
+    @apply border border-primary-100  w-36 py-2 px-4 rounded-none hover:bg-primary-200 bg-white;
+  }
+
+  .action_btn {
+    @apply border border-primary-100 w-[49%] py-2 px-4 rounded-none hover:bg-primary-200 bg-white;
+  }
+
+  .active {
+    @apply bg-primary-200;
+  }
+
+  .disabled {
+    @apply opacity-[50%];
+  }
+
+  .task {
+    @apply flex items-center px-3 py-2 mb-3 bg-gray-200;
+  }
+
+  .todo_task {
+    @apply bg-inherit p-1 border-[0.2rem] border-transparent w-full break-all focus:outline-none;
+  }
+
+  .editing {
+    @apply m-0 border-[0.2rem] border-primary-100 w-full bg-white !important;
+  }
+
+  .editing + .trash-btn {
+    @apply hidden;
+  }
+}
