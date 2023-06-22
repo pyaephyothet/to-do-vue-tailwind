@@ -74,7 +74,7 @@
             @dblclick="startEditing(todo.id)"
             @blur="finishEditing(todo.id)"
             @keyup.enter="finishEditing(todo.id)"
-            @keyup.esc="finishEditing(todo.id)"
+            @keyup.esc="reloadOnEscapeKey()"
             :class="{ editing: todo.id === state.editingTodoId }"
           />
           <button class="trash-btn" @click="deleteTodoById(todo.id)">
@@ -126,129 +126,116 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { reactive, computed, onMounted } from "vue";
 
-export default {
-  name: "App",
-  setup() {
-    const state = reactive({
-      todos: [],
-      newTodo: "",
-      filter: "all",
-      editingTodoId: null,
-    });
+const state = reactive({
+  todos: [],
+  newTodo: "",
+  filter: "all",
+  editingTodoId: null,
+});
 
-    const loadTodos = () => {
-      if (localStorage.getItem("todos")) {
-        state.todos = JSON.parse(localStorage.getItem("todos"));
-      }
-    };
-
-    const saveTodos = () => {
-      localStorage.setItem("todos", JSON.stringify(state.todos));
-    };
-
-    const updateTodos = () => {
-      saveTodos();
-    };
-
-    onMounted(loadTodos);
-
-    const addTodo = () => {
-      if (state.newTodo.trim() !== "") {
-        const todo = {
-          id: Date.now(),
-          text: state.newTodo.trim(),
-          completed: false,
-        };
-        state.todos.push(todo);
-        state.newTodo = "";
-      }
-      updateTodos();
-    };
-
-    const setFilter = (filter) => {
-      state.filter = filter;
-    };
-
-    const toggleTodoCompleted = (id, checked) => {
-      const todo = state.todos.find((todo) => todo.id === id);
-      if (todo) {
-        todo.completed = checked;
-      }
-      updateTodos();
-    };
-
-    const deleteTodoById = (id) => {
-      state.todos = state.todos.filter((todo) => todo.id !== id);
-      updateTodos();
-    };
-
-    const startEditing = (id) => {
-      state.editingTodoId = id;
-    };
-
-    const finishEditing = (id) => {
-      state.editingTodoId = null;
-      const todo = state.todos.find((todo) => todo.id === id);
-      if (todo) {
-        todo.text = todo.text.trim();
-      }
-      updateTodos();
-    };
-
-    const toggleAll = () => {
-      const allCompleted = state.todos.every((todo) => todo.completed);
-      state.todos.forEach((todo) => {
-        todo.completed = !allCompleted;
-      });
-    };
-
-    const clearCompleted = () => {
-      state.todos = state.todos.filter((todo) => !todo.completed);
-      updateTodos();
-    };
-
-    const activeCount = computed(() => {
-      return state.todos.filter((todo) => !todo.completed).length;
-    });
-
-    const filteredTodos = computed(() => {
-      if (state.filter === "active") {
-        return state.todos.filter((todo) => !todo.completed);
-      }
-      if (state.filter === "completed") {
-        return state.todos.filter((todo) => todo.completed);
-      }
-      return state.todos;
-    });
-
-    const completedCount = computed(() => {
-      return state.todos.filter((todo) => todo.completed).length;
-    });
-
-    const checkAllText = computed(() => {
-      return state.todos.every((todo) => todo.completed)
-        ? "Uncheck All"
-        : "Check All";
-    });
-
-    return {
-      state,
-      addTodo,
-      setFilter,
-      toggleTodoCompleted,
-      deleteTodoById,
-      startEditing,
-      finishEditing,
-      toggleAll,
-      clearCompleted,
-      activeCount,
-      filteredTodos,
-      completedCount,
-      checkAllText,
-    };
-  },
+const loadTodos = () => {
+  if (localStorage.getItem("todos")) {
+    state.todos = JSON.parse(localStorage.getItem("todos"));
+  }
 };
+
+const saveTodos = () => {
+  localStorage.setItem("todos", JSON.stringify(state.todos));
+};
+
+const updateTodos = () => {
+  saveTodos();
+};
+
+onMounted(loadTodos);
+
+const addTodo = () => {
+  if (state.newTodo.trim() !== "") {
+    const todo = {
+      id: Date.now(),
+      text: state.newTodo.trim(),
+      completed: false,
+    };
+    state.todos.push(todo);
+    state.newTodo = "";
+  }
+  updateTodos();
+};
+
+const setFilter = (filter) => {
+  state.filter = filter;
+};
+
+const toggleTodoCompleted = (id, checked) => {
+  const todo = state.todos.find((todo) => todo.id === id);
+  if (todo) {
+    todo.completed = checked;
+  }
+  updateTodos();
+};
+
+const deleteTodoById = (id) => {
+  state.todos = state.todos.filter((todo) => todo.id !== id);
+  updateTodos();
+};
+
+const startEditing = (id) => {
+  state.editingTodoId = id;
+};
+
+const finishEditing = (id) => {
+  state.editingTodoId = null;
+  const todo = state.todos.find((todo) => todo.id === id);
+  if (todo) {
+    todo.text = todo.text.trim();
+    if (todo.text === "") {
+      window.location.reload();
+      return;
+    }
+  }
+  updateTodos();
+};
+
+const reloadOnEscapeKey = () => {
+  window.location.reload();
+};
+
+const toggleAll = () => {
+  const allCompleted = state.todos.every((todo) => todo.completed);
+  state.todos.forEach((todo) => {
+    todo.completed = !allCompleted;
+  });
+};
+
+const clearCompleted = () => {
+  state.todos = state.todos.filter((todo) => !todo.completed);
+  updateTodos();
+};
+
+const activeCount = computed(() => {
+  return state.todos.filter((todo) => !todo.completed).length;
+});
+
+const filteredTodos = computed(() => {
+  if (state.filter === "active") {
+    return state.todos.filter((todo) => !todo.completed);
+  }
+  if (state.filter === "completed") {
+    return state.todos.filter((todo) => todo.completed);
+  }
+  return state.todos;
+});
+
+const completedCount = computed(() => {
+  return state.todos.filter((todo) => todo.completed).length;
+});
+
+const checkAllText = computed(() => {
+  return state.todos.every((todo) => todo.completed)
+    ? "Uncheck All"
+    : "Check All";
+});
 </script>
