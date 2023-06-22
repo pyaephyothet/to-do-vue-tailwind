@@ -58,7 +58,7 @@
         </button>
       </div>
       <!--  todo_tasks  -->
-      <ul class="pl-0 mt-4">
+      <ul class="pl-0 mt-4  max-h-[15rem] overflow-y-auto">
         <li v-for="todo in filteredTodos" :key="todo.id" class="task">
           <input
             type="checkbox"
@@ -74,7 +74,7 @@
             @dblclick="startEditing(todo.id)"
             @blur="finishEditing(todo.id)"
             @keyup.enter="finishEditing(todo.id)"
-            @keyup.esc="reloadOnEscapeKey()"
+            @keyup.esc="OnEscapeKey(todo.id)"
             :class="{ editing: todo.id === state.editingTodoId }"
           />
           <button class="trash-btn" @click="deleteTodoById(todo.id)">
@@ -182,8 +182,13 @@ const deleteTodoById = (id) => {
   updateTodos();
 };
 
+let oldValue = null;
 const startEditing = (id) => {
   state.editingTodoId = id;
+    const todo = state.todos.find(todo => todo.id === id);
+  if (todo) {
+    oldValue = todo.text;
+  }
 };
 
 const finishEditing = (id) => {
@@ -192,15 +197,19 @@ const finishEditing = (id) => {
   if (todo) {
     todo.text = todo.text.trim();
     if (todo.text === "") {
-      window.location.reload();
-      return;
+      todo.text = oldValue;
     }
   }
   updateTodos();
 };
 
-const reloadOnEscapeKey = () => {
-  window.location.reload();
+const OnEscapeKey = (id) => {
+  const todo = state.todos.find(todo => todo.id === id);
+  if (todo) {
+    todo.text = oldValue;
+    oldValue = null;
+  }
+  state.editingTodoId = null;
 };
 
 const toggleAll = () => {
