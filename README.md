@@ -1,4 +1,5 @@
-# TODO /w Vue.js & Tailwind
+# to-do-vue-tailwind
+
 
 ## About
 This is a simple todo app with filters and actions.
